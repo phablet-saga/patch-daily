@@ -18,8 +18,8 @@ cp /tmp/daily-patch/out/* . -R
 for f in *.tar.gz
 do
 	rm $f
-	tar -cvf - /tmp/daily-patch/tarball | gzip > manhattan-quantal-armhf-tar.tar.gz 
+	tar -cvf - /tmp/daily-patch/tarball --strip=3 | gzip > manhattan-quantal-armhf-tar.tar.gz 
 done
 
-cd $startdir
-zip -r quantal-preinstalled-phablet-armhf.zip /tmp/daily-patch/new/*
+zip -r quantal-preinstalled-phablet-armhf.zip *
+mv quantal-preinstalled-phablet-armhf.zip $startdir
