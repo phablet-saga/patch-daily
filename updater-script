@@ -1,0 +1,34 @@
+ui_print("");
+ui_print("Welcome to the Ubuntu RootFS Updater");
+ui_print("");
+
+show_progress(1.000000, 60);
+
+ui_print("Mounting userdata partition...");
+run_program("/sbin/mount","/data");
+run_program("/sbin/mount","/sdcard");
+set_progress(0.100000);
+
+ui_print("Copying the ubuntu rootfs tarball...");
+package_extract_file("manhattan-quantal-armhf-tar.tar.gz", "/sdcard/ubuntu-rootfs.tar.gz");
+set_progress(0.300000);
+
+ui_print("Extracting the ubuntu rootfs tarball...");
+delete_recursive("/data/ubuntu_tmp_extract");
+run_program("/sbin/mkdir", "/data/ubuntu_tmp_extract");
+run_program("/sbin/tar", "--numeric-owner", "-xzf", "/sdcard/ubuntu-rootfs.tar.gz", "-C", "/data/ubuntu_tmp_extract");
+set_progress(0.600000);
+
+ui_print("Setting up the new ubuntu rootfs...");
+delete_recursive("/data/ubuntu");
+run_program("/sbin/mv", "/data/ubuntu_tmp_extract/binary/casper/filesystem.dir", "/data/ubuntu");
+set_progress(0.800000);
+
+ui_print("Cleaning up");
+delete("/sdcard/ubuntu-rootfs.tar.gz");
+delete_recursive("/data/ubuntu_tmp_extract");
+set_progress(0.900000);
+
+unmount("/data");
+run_program("/sbin/sync");
+set_progress(1.000000);
