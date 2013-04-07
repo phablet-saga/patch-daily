@@ -1,5 +1,5 @@
 #!/bin/sh
-rm /tmp/daily-patch -R
+rm /tmp/daily-patch -Rf
 mkdir /tmp/daily-patch
 mkdir /tmp/daily-patch/out
 mkdir /tmp/daily-patch/tarball
@@ -9,19 +9,18 @@ wget http://cdimage.ubuntu.com/ubuntu-touch-preview/daily-preinstalled/current/q
 unzip /tmp/daily-patch/quantal-preinstalled-phablet-armhf.zip -d /tmp/daily-patch/out
 cp ./updater-script /tmp/daily-patch/out/META-INF/com/google/android/updater-script
 
-tar -C /tmp/daily-patch/tarball -xvzf /tmp/daily-patch/out/manhattan-quantal-armhf-tar*
-patch /tmp/daily-patch/tarball/binary/casper/filesystem.dir/usr/bin/ubuntu-session ./saga-screen.patch
+mv /tmp/daily-patch/out/manhattan-quantal-armhf-tar-*.tar.gz /tmp/daily-patch/out/manhattan-quantal-armhf-tar.tar.gz
+gunzip -c /tmp/daily-patch/out/manhattan-quantal-armhf-tar.tar.gz > /tmp/daily-patch/out/manhattan-quantal-armhf-tar.tar
+
+#New method, https://wiki.ubuntu.com/Touch/Porting#Screen_Pixel_Ratio
+tar -rvf /tmp/daily-patch/out/manhattan-quantal-armhf-tar.tar binary/casper/filesystem.dir/etc/ubuntu-session.d/saga.conf
+
+gzip -c /tmp/daily-patch/out/manhattan-quantal-armhf-tar.tar > /tmp/daily-patch/out/manhattan-quantal-armhf-tar.tar.gz
+rm /tmp/daily-patch/out/manhattan-quantal-armhf-tar.tar
 
 startdir=`pwd`
 cd /tmp/daily-patch/new
 cp /tmp/daily-patch/out/* . -R
-for f in *.tar.gz
-do
-	rm $f
-	cd /tmp/daily-patch/tarball
-	tar -cvf - * | gzip > /tmp/daily-patch/new/manhattan-quantal-armhf-tar.tar.gz 
-	cd /tmp/daily-patch/new
-done
 
 zip -r quantal-preinstalled-phablet-armhf.zip *
 mv quantal-preinstalled-phablet-armhf.zip $startdir
